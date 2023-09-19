@@ -42,8 +42,9 @@ fn num_players<'a>(player_count: i32, mut hands: [&'a mut Hand; 5], deck: &'a mu
 
 fn calculate_hand(hand: &mut Hand) -> i32{
     let mut result: i32 = 0;
+    print!("|--");
     for x in &mut hand.cards{
-        println!("Card: {}", x);
+        print!(" {} ", x);
         match x.rank.to_str(){
             "Two" =>result += 2,
             "Three" =>result += 3,
@@ -58,8 +59,12 @@ fn calculate_hand(hand: &mut Hand) -> i32{
             _ =>result += 1,
         };
     }
-
+    print!("--|");
 result
+}
+
+fn hit_me(hand: &mut Hand, deck: &mut Deck){
+    deck.deal_to_hand(hand, 1);
 }
 
 
@@ -111,17 +116,18 @@ fn main() {
     //Returns the number of players and fills initial hands
     hands = num_players(player_count, hands, &mut deck);
 
-    let player_number: i8 = 0;
-    for x in hands{
-        if !(x.cards.is_empty()){
-            if player_number != 0{
-            println!("House: {}({})     ", x, calculate_hand(x));
+    let mut i = 0;
+    while i < 5 && !(hands[i].cards().is_empty()){
+            let mut input: String = Default::default();
+            println!("$$ House $$: {}", calculate_hand(hands[i]));
+            println!("  Total: {}", calculate_hand(hands[i]));
+            //INSERT SPLITTING HERE
+            println!("Hit or Stay? (Type Hit/H or Stay/S");
+            io::stdin().read_line(&mut input).expect("Failure to read line...");
+            if input.to_lowercase() == "hit" || input.to_lowercase() == "h"{
+                hit_me(hands[i], &mut deck);
             }
-            else{
-
-            }
-
-        }
+        i += 1;
     }
     // let mut input = String::new();
     // let mut i = 1;
