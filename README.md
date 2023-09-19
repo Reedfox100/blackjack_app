@@ -12,7 +12,7 @@ Take the time to test it out, have some fun with local friends (it is multiplaye
 
 ## Future Changes:
 * Correct splitting
-* Shoe changes
+* Shoe changes (Different sizes of decks)
 * UI??
 
 
