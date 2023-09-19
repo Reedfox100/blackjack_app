@@ -8,6 +8,7 @@ Take the time to test it out, have some fun with local friends (it is multiplaye
 ## Details:
 * Up to 4 Players (Not including the house)
 * Runnable and playable all in a Command Line
+* Developed for the purpose of practice, not betting
 
 ## Future Changes:
 * Correct splitting
