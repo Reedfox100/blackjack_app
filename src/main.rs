@@ -67,6 +67,37 @@ fn hit_me(hand: &mut Hand, deck: &mut Deck){
     deck.deal_to_hand(hand, 1);
 }
 
+fn player_choice(hands: [&mut Hand; 5], mut deck: &mut Deck, iter: usize){
+    let mut input: String = Default::default();
+    println!("$$ House $$: {}", calculate_hand(hands[iter]));
+    println!("  Total: {}", calculate_hand(hands[iter]));
+
+    //Query the player to return a hit or stay after giving new hand number
+    println!("Hit or Stay? (Type Hit/H or Stay/S");
+    io::stdin().read_line(&mut input).expect("Failure to read line...");
+    if input.to_lowercase() == "hit" || input.to_lowercase() == "h"{
+        hit_me(hands[iter], &mut deck);
+    }
+    else if input.to_lowercase() == "stay" || input.to_lowercase() == "s"{
+    }
+    else{
+        println!("Please return a value of 'Hit' or 'Stay'");
+        player_choice(hands, deck, iter);
+    }
+}
+
+fn run_app<'a>(player_count: i32, mut hands: [&'a mut Hand; 5], mut deck: &'a mut Deck){
+   //Returns the number of players and fills initial hands
+   
+    //Iterate through each
+    let mut i = 0;
+   while i < 5 && !(hands[i].cards.is_empty()){
+           //INSERT SPLITTING HERE
+           player_choice(hands, &mut deck, i);
+       i += 1;
+   }
+}
+
 
 fn main() {
     // enum Values{
@@ -113,22 +144,8 @@ fn main() {
         &mut player3,
         &mut player4,
     ];
-    //Returns the number of players and fills initial hands
     hands = num_players(player_count, hands, &mut deck);
-
-    let mut i = 0;
-    while i < 5 && !(hands[i].cards().is_empty()){
-            let mut input: String = Default::default();
-            println!("$$ House $$: {}", calculate_hand(hands[i]));
-            println!("  Total: {}", calculate_hand(hands[i]));
-            //INSERT SPLITTING HERE
-            println!("Hit or Stay? (Type Hit/H or Stay/S");
-            io::stdin().read_line(&mut input).expect("Failure to read line...");
-            if input.to_lowercase() == "hit" || input.to_lowercase() == "h"{
-                hit_me(hands[i], &mut deck);
-            }
-        i += 1;
-    }
+    run_app(player_count, hands, &mut deck);
     // let mut input = String::new();
     // let mut i = 1;
     // while i < 5 && !(hands[i].cards().is_empty()){
