@@ -15,9 +15,9 @@ fn press_enter() {
 
 fn num_players<'a>(
     player_count: i32,
-    mut hands: &[&'a mut Hand; 5],
+    mut hands: [&'a mut Hand; 5],
     deck: &'a mut Deck,
-) -> &'a[&'a mut Hand; 5]{
+) -> ([&'a mut Hand; 5], &'a mut Deck){
     //shuffle deck and deal hands to each player, including house (currently only 1).
     //future for statement to iterate through players and deal handsdeal hands.
     if player_count == 1 {
@@ -47,14 +47,14 @@ fn num_players<'a>(
             deck.deal_to_hand(&mut hands[0], 1);
         }
     }
-&hands
+(hands, deck)
     
 }
 
-fn calculate_hand(hand: &mut Hand) -> i32 {
+fn calculate_hand(hand: & Hand) -> i32 {
     let mut result: i32 = 0;
     print!("|--");
-    for x in &mut hand.cards {
+    for x in &hand.cards {
         print!(" {} ", x);
         match x.rank.to_str() {
             "Two" => result += 2,
@@ -74,11 +74,12 @@ fn calculate_hand(hand: &mut Hand) -> i32 {
     result
 }
 
-fn hit_me(hand: &mut Hand, deck: &mut Deck) {
+fn hit_me<'a>(hand: &'a mut Hand, deck: &mut Deck) -> &'a mut Hand {
     deck.deal_to_hand(hand, 1);
+    hand
 }
 
-fn player_choice(hands: [&mut Hand; 5], mut deck: &mut Deck, iter: usize) {
+fn player_choice(hands: &mut[&mut Hand; 5], mut deck: &mut Deck, iter: usize) {
     let mut input: String = Default::default();
     let calced_hand = calculate_hand(hands[iter]);
     if iter == 0 {
@@ -118,9 +119,9 @@ fn run_app<'a>(player_count: i32, mut hands: [&'a mut Hand; 5], mut deck: &'a mu
 
     //Iterate through each
     let mut i = 0;
-    while i < 5 && !(&hands[i].cards.is_empty()) {
+    while i < 5 && !(hands[i].cards.is_empty()) {
         //INSERT SPLITTING HERE
-        player_choice(hands, &mut deck, i);
+        player_choice(&mut hands, &mut deck, i);
         i += 1;
     }
 }
@@ -142,9 +143,10 @@ fn main() {
         &mut player3,
         &mut player4,
     ];
-    hands = num_players(player_count, &hands, &mut deck);
+    let current: &mut Deck;
+    (hands, current) = num_players(player_count, hands, &mut deck);
 
-    run_app(player_count, hands, &mut deck);
+    run_app(player_count, hands, current);
 
     // let mut input = String::new();
     // let mut i = 1;
