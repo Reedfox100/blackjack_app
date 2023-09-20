@@ -15,9 +15,9 @@ fn press_enter() {
 
 fn num_players<'a>(
     player_count: i32,
-    mut hands: [&'a mut Hand; 5],
+    mut hands: &[&'a mut Hand; 5],
     deck: &'a mut Deck,
-) -> [&'a mut Hand; 5] {
+) -> &'a[&'a mut Hand; 5]{
     //shuffle deck and deal hands to each player, including house (currently only 1).
     //future for statement to iterate through players and deal handsdeal hands.
     if player_count == 1 {
@@ -47,8 +47,8 @@ fn num_players<'a>(
             deck.deal_to_hand(&mut hands[0], 1);
         }
     }
-
-    hands
+&hands
+    
 }
 
 fn calculate_hand(hand: &mut Hand) -> i32 {
@@ -94,8 +94,9 @@ fn player_choice(hands: [&mut Hand; 5], mut deck: &mut Deck, iter: usize) {
         } else if calced_hand == 21 {
             println!("BLACKJACK!! You have won your hand for now...");
         } else {
-            println!("You have not busted.")
+            println!("You have not busted.");
         }
+        press_enter();
     }
 
     //Query the player to return a hit or stay after giving new hand number
@@ -117,7 +118,7 @@ fn run_app<'a>(player_count: i32, mut hands: [&'a mut Hand; 5], mut deck: &'a mu
 
     //Iterate through each
     let mut i = 0;
-    while i < 5 && !(hands[i].cards.is_empty()) {
+    while i < 5 && !(&hands[i].cards.is_empty()) {
         //INSERT SPLITTING HERE
         player_choice(hands, &mut deck, i);
         i += 1;
@@ -141,7 +142,7 @@ fn main() {
         &mut player3,
         &mut player4,
     ];
-    hands = num_players(player_count, hands, &mut deck);
+    hands = num_players(player_count, &hands, &mut deck);
 
     run_app(player_count, hands, &mut deck);
 
