@@ -66,8 +66,7 @@ fn calculate_hand(hand: &Hand) -> i32 {
             "Eight" => result += 8,
             "Nine" => result += 9,
             "Ten" | "King" | "Queen" | "Jack" => result += 10,
-            "Ace" => result += 11,
-            _ => result += 1,
+            _ => result += 11,
         };
     }
     if (hand.cards.contains(&Card { rank: Rank::Ace, suit: Suit::Clubs }) || hand.cards.contains(&Card { rank: Rank::Ace, suit: Suit::Diamonds }) || hand.cards.contains(&Card { rank: Rank::Ace, suit: Suit::Hearts }) || hand.cards.contains(&Card { rank: Rank::Ace, suit: Suit::Spades })) && calculate_hand(hand) > 21{
