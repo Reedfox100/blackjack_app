@@ -90,6 +90,7 @@ fn player_choice(hands: &mut [&mut Hand; 5], mut deck: &mut Deck, iter: usize) {
     let calc_house = calculate_hand(hands[0], true);
     while true {
         //Define basic variables and print out normal returns
+        print!("\x1B[2J\x1B[1;1H");
         let mut input: String = "".to_string();
         if calc_house == 21 {
             println!("$$ House $$: {}", calc_house);
@@ -99,6 +100,7 @@ fn player_choice(hands: &mut [&mut Hand; 5], mut deck: &mut Deck, iter: usize) {
             println!("==========================================================");
             println!("Apologies, its a push. Dealer started with 21. No losses");
             println!("==========================================================");
+            press_enter();
             return;
         }
         //hand can be played VVV
@@ -119,12 +121,14 @@ fn player_choice(hands: &mut [&mut Hand; 5], mut deck: &mut Deck, iter: usize) {
                 println!("You have busted and lost the round. Better luck next time!");
                 println!("==========================================================");
                 println!("");
+                press_enter();
                 return;
             } else if calced_hand == 21 {
                 println!("=============================================");
                 println!("BLACKJACK!! You have won your hand for now...");
                 println!("=============================================");
                 println!("");
+                press_enter();
                 return;
             } else {
                 println!("You have not busted.");
@@ -146,9 +150,9 @@ fn player_choice(hands: &mut [&mut Hand; 5], mut deck: &mut Deck, iter: usize) {
                 println!("     You have decided to stay your hand");
                 println!("=============================================");
                 println!("");
+                press_enter();
                 return;
             } else {
-                println!("Please return a value of 'Hit' or 'Stay'");
                 continue;
             }
         }
@@ -161,7 +165,6 @@ fn calc_winners(player_count: usize, hands: &mut [&mut Hand; 5], deck: &mut Deck
     print!("\x1B[2J\x1B[1;1H");
     println!("$$ House $$: {}", calc_house);
     println!("Lets see what the house hits...");
-    press_enter();
     while calc_house <= 16 {
         hit_me(hands[0], deck);
         calc_house = calculate_hand(hands[0], true);
@@ -195,9 +198,9 @@ fn calc_winners(player_count: usize, hands: &mut [&mut Hand; 5], deck: &mut Deck
         println!("===============================================");
         println!("");
     } else {
-        println!("======================================");
-        println!("The has has scored a {}. Losses scored", calc_house);
-        println!("======================================");
+        println!("========================");
+        println!("The has has scored a {}.", calc_house);
+        println!("========================");
         println!("");
     }
     //display winners and losers, as well as scores
@@ -235,6 +238,7 @@ fn run_app<'a>(player_count: usize, mut hands: [&'a mut Hand; 5], mut deck: &'a 
 }
 
 fn player_amount() -> usize {
+    print!("\x1B[2J\x1B[1;1H");
     println!("Please choose the number of players, maximum of 4, at the table.");
     let mut input: String = "".to_string();
     io::stdin()
