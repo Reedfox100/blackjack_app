@@ -1,10 +1,7 @@
 use deckofcards::{Card, Cards, Deck, Hand, Rank, Suit};
-use rand::{
-    rngs::mock::StepRng,
-    seq::{self, SliceRandom},
-};
 use std::io::{stdin, stdout, Read, Write};
-use std::{io, mem, ptr::null};
+use std::process::exit;
+use std::{io};
 
 //Easy function for a stop or pause in the code
 fn press_enter() {
@@ -55,7 +52,12 @@ fn num_players<'a>(
 //Calculated the hand value and returns it
 fn calculate_hand(hand: &Hand) -> i32 {
     let mut result: i32 = 0;
+    
     for x in &hand.cards {
+        if x.rank.to_str() == "Ace" && result > 21{
+            println!("Ace downgraded to a 1 to avoid going over.");
+            result -= 10;
+        }
         match x.rank.to_str() {
             "Two" => result += 2,
             "Three" => result += 3,
@@ -66,12 +68,11 @@ fn calculate_hand(hand: &Hand) -> i32 {
             "Eight" => result += 8,
             "Nine" => result += 9,
             "Ten" | "King" | "Queen" | "Jack" => result += 10,
-            _ => result += 11,
+            "Ace"=> result += 11,
+            _ => result += 0,
         };
-    }
-    if (hand.cards.contains(&Card { rank: Rank::Ace, suit: Suit::Clubs }) || hand.cards.contains(&Card { rank: Rank::Ace, suit: Suit::Diamonds }) || hand.cards.contains(&Card { rank: Rank::Ace, suit: Suit::Hearts }) || hand.cards.contains(&Card { rank: Rank::Ace, suit: Suit::Spades })) && calculate_hand(hand) > 21{
-        println!("Ace downgraded to a 1 to avoid going over.");
-        result -= 10;
+
+        
     }
     result
 }
@@ -79,6 +80,7 @@ fn calculate_hand(hand: &Hand) -> i32 {
 //Hits the player with a new card and returns the new version of the hand
 fn hit_me<'a>(hand: &'a mut Hand, deck: &mut Deck) -> &'a mut Hand {
     deck.deal_to_hand(hand, 1);
+    calculate_hand(hand);
     hand
 }
 
@@ -86,8 +88,7 @@ fn player_choice(hands: &mut [&mut Hand; 5], mut deck: &mut Deck, iter: usize) {
     //Define basic variables and print out normal returns
     let mut input: String = "".to_string();
     let calc_house = calculate_hand(hands[0]);
-    let calced_hand = calculate_hand(hands[iter]);
-    let mut push = false;
+    let mut calced_hand = calculate_hand(hands[iter]);
     if calc_house == 21 {
         println!("$$ House $$: {}", calc_house);
         println!("------------------------");
@@ -96,11 +97,9 @@ fn player_choice(hands: &mut [&mut Hand; 5], mut deck: &mut Deck, iter: usize) {
         println!("==========================================================");
         println!("Apologies, its a push. Dealer started with 21. No losses");
         println!("==========================================================");
-        push = false;
         return;
     }
     //hand can be played VVV
-    if push == false {
         if iter == 0 {
             return;
         } else {
@@ -138,7 +137,7 @@ fn player_choice(hands: &mut [&mut Hand; 5], mut deck: &mut Deck, iter: usize) {
 
             //Determine hit or stay function
             if input.to_lowercase().contains("hit") {
-                let _ = calced_hand + calculate_hand(&hit_me(hands[iter], &mut deck));
+                calced_hand = calculate_hand(&hit_me(hands[iter], &mut deck));
                 player_choice(hands, deck, iter);
             } else if input.to_lowercase().contains("stay") {
                 println!("=============================================");
@@ -152,7 +151,6 @@ fn player_choice(hands: &mut [&mut Hand; 5], mut deck: &mut Deck, iter: usize) {
             }
         }
     }
-}
 
 fn calc_winners(player_count: usize, hands: &mut [&mut Hand; 5], deck: &mut Deck) {
     //calculate house score before determining winners
@@ -166,9 +164,10 @@ fn calc_winners(player_count: usize, hands: &mut [&mut Hand; 5], deck: &mut Deck
     }
     //Check bust or win from house
     println!("-------------------------------");
-    println!("{}", hands[0]);
-    print!("    Score: {}", calc_house);
+    print!("{}", hands[0]);
+    println!("    Score: {}", calc_house);
     println!("-------------------------------");
+    println!("");
 
     if calc_house > 22 {
         println!("=====================================");
@@ -201,18 +200,18 @@ fn calc_winners(player_count: usize, hands: &mut [&mut Hand; 5], deck: &mut Deck
     }
     //display winners and losers, as well as scores
     let mut i = 0;
-    while i <= player_count{
+    while i < player_count{
         i += 1;
         println!("--------------------------");
-        println!("Player#{}: {},  Score:{}", player_count, hands[player_count], calculate_hand(hands[player_count]));
-        if calculate_hand(hands[player_count]) > calc_house{
-            print!(" >>> WINNER");
+        println!("Player#{}: {},  Score:{}", i, hands[i], calculate_hand(hands[i]));
+        if calculate_hand(hands[i]) > calc_house{
+            println!(" >>> WINNER");
         }
-        else if calculate_hand(hands[player_count]) == calc_house{
-            print!(" >>> TIE");
+        else if calculate_hand(hands[i]) == calc_house{
+            println!(" >>> TIE");
         }
         else{
-            print!(" >>> LOSSER");
+            println!(" >>> LOSSER");
         }
     }
 }
@@ -230,15 +229,24 @@ fn run_app<'a>(player_count: usize, mut hands: [&'a mut Hand; 5], mut deck: &'a 
     calc_winners(player_count, &mut hands, &mut deck);
 }
 
-fn rerun_app(){
-
+fn player_amount() -> usize{
+    println!("Please choose the number of players, maximum of 4, at the table.");
+    let mut input: String = "".to_string();
+    io::stdin()
+                .read_line(&mut input)
+                .expect("Failure to read line...");
+    let output:usize = input.parse::<usize>().unwrap();
+    output
 }
 
 fn main() {
+    std::thread::Builder::new().stack_size(33554432).spawn(||{
+        // your code here
+    }).unwrap().join().unwrap();
     //Make deck, player, and house (increasing number of max players later)
     let mut deck = Deck::new();
     deck.shuffle();
-    let player_count: usize = 2; //Temporary number until input is added
+    let player_count:usize; //Temporary number until input is added
     let mut player1 = Hand::new();
     let mut player2 = Hand::new();
     let mut player3 = Hand::new();
@@ -251,19 +259,15 @@ fn main() {
         &mut player3,
         &mut player4,
     ];
-    let current: &mut Deck;
+    let mut current: &mut Deck = &mut deck;
 
     //Returns the number of players and fills initial hands
+    player_count = player_amount();
     (hands, current) = num_players(player_count, hands, &mut deck);
     run_app(player_count, hands, current);
-    rerun_app();
+    //Add replay button or question VVVV
 
-    // let mut input = String::new();
-    // let mut i = 1;
-    // while i < 5 && !(hands[i].cards().is_empty()){
-    //     println!("Hand: {}", hands[i]);
-    //     i += 1;
-    // }
+
 
     // enum Values{
     //     Ace(String, [usize; 2]),
