@@ -38,4 +38,26 @@ The current structure of the program includes some help from a Rust crate known 
 This wonderful crate has simple logic that could have been re-produced in my project, but if we have the resources, why not save some time and use an already-created deck!
 The following is a layout of the program:
 
->Insert information regarding syntax and inner functions
+### Main
+A basic function for running the program. Everything starts somewhere.
+
+### player_amount
+Function for choosing the number of players and storing it for later iteration
+
+### run_app
+The heart of the application, as most things are originally called from here, will iterate over the created hands for proper use.
+
+### num_players
+Deals cards to each player depending on how many are chosen, making sure to depict the hands as needed accurately. Further work here will hopefully translate the hands into better visual representations.
+
+### calculate_hand
+The brain of the application, allows us to determine the total value of a hand, returning it to multiple different functions later.
+
+### hit_me
+As the name says, it hits the player with a new card in their hand and returns the new version.
+
+### player_choice
+Sends a query to the player to determine how they want to play their hand and goes through the motions of the game itself before going to calc_winners.
+
+### calc_winners
+Calculates scores compared to the house and reads off who won, how they won, and what happened to the house. The beginning of the function also uses normal house decision-making to make the game run correctly.
